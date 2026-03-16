@@ -1,0 +1,35 @@
+@import "tailwindcss";
+:root {
+  --bg-dark: #0a0a0a;
+  --card-bg: #111111;
+  --primary-blue: #2563eb;
+  --secondary-blue: #1e3a8a;
+  --accent-blue: #60a5fa;
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --glow-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hiệu ứng kính mờ cho các phần tử đặc biệt */
+.glass-effect {
+  background: rgba(17, 17, 17, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+/* Gradient Text cho tiêu đề */
+.text-gradient-blue {
+  background: linear-gradient(to right, var(--accent-blue), var(--primary-blue));
+  background-clip: text;        /* chuẩn */
+  -webkit-background-clip: text; /* Chrome/Safari */
+  -webkit-text-fill-color: transparent;
+}

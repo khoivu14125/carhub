@@ -1,0 +1,52 @@
+/* Card Styles với hiệu ứng Blue Glow khi Hover */
+.car-card-modern {
+  background-color: var(--card-bg);
+  border: 1px solid #1f2937;
+  transition: all 0.3s ease-in-out;
+}
+
+.car-card-modern:hover {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 30px rgba(37, 99, 235, 0.2);
+  transform: translateY(-8px);
+}
+
+/* Nút bấm Modern Blue */
+.btn-modern {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-primary-blue {
+  background-color: var(--primary-blue);
+  color: white;
+  box-shadow: var(--glow-shadow);
+}
+
+.btn-primary-blue:hover {
+  background-color: #3b82f6;
+  box-shadow: 0 0 25px rgba(37, 99, 235, 0.5);
+  transform: scale(1.02);
+}
+
+/* Custom Input Fields */
+.input-field-dark {
+  background-color: #050505;
+  border: 1px solid #1f2937;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-field-dark:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.1);
+}
