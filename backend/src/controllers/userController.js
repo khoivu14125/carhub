@@ -98,6 +98,21 @@ updateUserRole: async (req, res) => {
     }
 },
 
+deleteUser: async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (Number(id) === req.user.id) {
+            return res.status(400).json({ message: 'Bạn không thể tự xóa chính mình' });
+        }
+
+        await User.deleteUser(id);
+        res.json({ message: 'Xóa thành viên thành công' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+},
+
 };
 
 module.exports = userController;

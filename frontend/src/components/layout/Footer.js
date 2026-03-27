@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Send, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -13,9 +13,9 @@ const Footer = () => {
             Nền tảng mua bán xe trực tuyến hàng đầu Việt Nam. Kết nối người mua và người bán với sự tin tưởng tuyệt đối.
           </p>
           <div className="flex space-x-4">
-            <Facebook className="text-gray-500 hover:text-blue-500 cursor-pointer transition" />
-            <Instagram className="text-gray-500 hover:text-pink-500 cursor-pointer transition" />
-            <Twitter className="text-gray-500 hover:text-blue-400 cursor-pointer transition" />
+            <Globe className="text-gray-500 hover:text-blue-500 cursor-pointer transition" />
+            <MessageCircle className="text-gray-500 hover:text-pink-500 cursor-pointer transition" />
+            <Send className="text-gray-500 hover:text-blue-400 cursor-pointer transition" />
           </div>
         </div>
 

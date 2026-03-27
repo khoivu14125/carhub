@@ -18,6 +18,15 @@ router.get(
   carController.getPendingCars
 );
 
+// @route   GET /api/cars/admin/all
+// @desc    Admin lấy tất cả xe trong hệ thống
+router.get(
+  '/admin/all',
+  protect,
+  authorize('admin'),
+  carController.getAllCarsForAdmin
+);
+
 // @route   GET /api/cars/seller/stats
 // @desc    Seller lấy thống kê dashboard
 router.get(
@@ -76,7 +85,6 @@ router.put(
 
 // @route   GET /api/cars/:id
 // @desc    Lấy chi tiết xe
-// LUÔN để route động ở cuối
 router.get('/:id', carController.getCarById);
 
 module.exports = router;

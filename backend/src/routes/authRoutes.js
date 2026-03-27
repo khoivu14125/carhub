@@ -10,4 +10,14 @@ router.post('/register', authController.register);
 // @desc    Đăng nhập và nhận Token
 router.post('/login', authController.login);
 
+// ===== QUÊN MẬT KHẨU =====
+
+// @route   POST /api/auth/forgot-password
+// @desc    Gửi link reset mật khẩu
+router.post('/forgot-password', authController.forgotPassword);
+
+// @route   POST /api/auth/reset-password
+// @desc    Đặt lại mật khẩu mới
+router.post('/reset-password', authController.resetPassword);
+
 module.exports = router;

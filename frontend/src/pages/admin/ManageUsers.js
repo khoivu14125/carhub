@@ -19,12 +19,30 @@ const ManageUsers = () => {
     }, []);
 
     const toggleRole = async (userId, currentRole) => {
+        const newRole = currentRole === 'buyer' ? 'seller' : 'buyer';
+
         try {
-            const newRole = currentRole === 'buyer' ? 'seller' : 'buyer';
             await API.put(`/users/${userId}/role`, { role: newRole });
             fetchUsers();
         } catch (err) {
             console.error('Lỗi đổi vai trò:', err);
+            alert(err.response?.data?.message || 'Không thể đổi vai trò');
+        }
+    };
+
+    const deleteUser = async (userId, userName) => {
+        const confirmDelete = window.confirm(
+            `Bạn có chắc muốn xóa thành viên "${userName}" không?`
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            await API.delete(`/users/${userId}`);
+            fetchUsers();
+        } catch (err) {
+            console.error('Lỗi xóa user:', err);
+            alert(err.response?.data?.message || 'Không thể xóa thành viên');
         }
     };
 
@@ -58,25 +76,35 @@ const ManageUsers = () => {
                                         className={`px-3 py-1 rounded-lg font-bold text-[10px] ${
                                             user.role === 'admin'
                                                 ? 'bg-red-500/20 text-red-500'
-                                                : 'bg-blue-500/20 text-blue-500'
+                                                : user.role === 'seller'
+                                                ? 'bg-blue-500/20 text-blue-500'
+                                                : 'bg-cyan-500/20 text-cyan-400'
                                         }`}
                                     >
                                         {user.role.toUpperCase()}
                                     </span>
                                 </td>
+
                                 <td className="p-5 text-right space-x-2">
                                     {user.role !== 'admin' && (
                                         <button
                                             onClick={() => toggleRole(user.id, user.role)}
                                             className="p-2 hover:bg-gray-800 rounded-lg text-gray-400 hover:text-white transition"
+                                            title="Đổi vai trò buyer/seller"
                                         >
                                             <ShieldCheck size={18} />
                                         </button>
                                     )}
 
-                                    <button className="p-2 hover:bg-red-500/10 rounded-lg text-gray-400 hover:text-red-500 transition">
-                                        <Trash2 size={18} />
-                                    </button>
+                                    {user.role !== 'admin' && (
+                                        <button
+                                            onClick={() => deleteUser(user.id, user.name)}
+                                            className="p-2 hover:bg-red-500/10 rounded-lg text-gray-400 hover:text-red-500 transition"
+                                            title="Xóa thành viên"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
                                 </td>
                             </tr>
                         ))

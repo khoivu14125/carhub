@@ -17,6 +17,16 @@ const authService = {
         return response.data;
     },
 
+    forgotPassword: async (data) => {
+        const res = await API.post('/auth/forgot-password', data);
+        return res.data;
+    },
+
+    resetPassword: async (data) => {
+        const res = await API.post('/auth/reset-password', data);
+        return res.data;
+    },
+
     // Đăng xuất
     logout: () => {
         localStorage.removeItem('token');

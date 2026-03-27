@@ -75,23 +75,30 @@ const Order = {
     },
 
     // Thống kê cho Seller dashboard
-    getSellerStats: async (sellerId) => {
-        const sql = `
-            SELECT
-                COUNT(Orders.id) AS newOrders,
-                COALESCE(SUM(
-                    CASE
-                        WHEN Orders.paymentStatus = 'paid' THEN Orders.total_amount
-                        ELSE 0
-                    END
-                ), 0) AS totalRevenue
-            FROM Orders
-            JOIN Cars ON Orders.car_id = Cars.id
-            WHERE Cars.seller_id = ?
-        `;
+ getSellerStats: async (sellerId) => {
+  const sql = `
+    SELECT
+      COUNT(
+        CASE
+          WHEN Orders.paymentStatus = 'unpaid'
+               OR Orders.order_status = 'processing'
+          THEN Orders.id
+          ELSE NULL
+        END
+      ) AS newOrders,
+      COALESCE(SUM(
+        CASE
+          WHEN Orders.paymentStatus = 'paid' THEN Orders.total_amount
+          ELSE 0
+        END
+      ), 0) AS totalRevenue
+    FROM Orders
+    JOIN Cars ON Orders.car_id = Cars.id
+    WHERE Cars.seller_id = ?
+  `;
 
-        const [rows] = await db.query(sql, [sellerId]);
-        return rows[0];
+  const [rows] = await db.query(sql, [sellerId]);
+  return rows[0];
     }
 };
 

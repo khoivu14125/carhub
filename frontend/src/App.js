@@ -15,6 +15,8 @@ import Login from './pages/common/Login';
 import Register from './pages/common/Register';
 import NotFound from './pages/common/NotFound';
 import Profile from './pages/common/Profile';
+import ForgotPassword from './pages/common/ForgotPassword';
+import ResetPassword from './pages/common/ResetPassword';
 
 // --- BUYER PAGES ---
 import Inventory from './pages/buyer/Inventory';
@@ -28,12 +30,15 @@ import PostCar from './pages/seller/PostCar';
 import ManageCars from './pages/seller/ManageCars';
 import OrderRequests from './pages/seller/OrderRequests';
 import EditCar from './pages/seller/EditCar';
+import ViewRequests from './pages/seller/ViewRequests';
 
 // --- ADMIN PAGES ---
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageUsers from './pages/admin/ManageUsers';
 import ApproveCars from './pages/admin/ApproveCars';
 import AllOrders from './pages/admin/AllOrders';
+import Revenue from './pages/admin/Revenue';
+import AllCars from './pages/admin/AllCars';
 
 function App() {
   return (
@@ -51,13 +56,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/inventory" element={<Inventory />} />
             <Route path="/car/:id" element={<CarDetail />} />
-
-            {/* --- BUYER ROUTES (Cần đăng nhập) --- */}
-            <Route element={<ProtectedRoute allowedRoles={['buyer', 'seller', 'admin']} />}>
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/my-orders" element={<MyOrders />} />
-            </Route>
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
             {/* --- SELLER ROUTES (Chỉ dành cho Người bán) --- */}
             <Route element={<ProtectedRoute allowedRoles={['seller']} />}>
@@ -66,14 +66,17 @@ function App() {
               <Route path="/seller/manage-cars" element={<ManageCars />} />
               <Route path="/seller/edit-car/:id" element={<EditCar />} />
               <Route path="/seller/orders" element={<OrderRequests />} />
+              <Route path="/seller/view-requests" element={<ViewRequests />} />
             </Route>
 
             {/* --- ADMIN ROUTES (Chỉ dành cho Quản trị viên) --- */}
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route path="/admin/users" element={<ManageUsers />} />
+              <Route path="/admin/all-cars" element={<AllCars />} />
               <Route path="/admin/approve-cars" element={<ApproveCars />} />
               <Route path="/admin/all-orders" element={<AllOrders />} />
+              <Route path="/admin/revenue" element={<Revenue />} />
             </Route>
 
             {/* --- PROFILE (Cần đăng nhập) --- */}

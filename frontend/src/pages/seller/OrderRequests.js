@@ -4,11 +4,11 @@ import { User, Phone, MapPin, CheckCircle2 } from 'lucide-react';
 
 const OrderRequests = () => {
     const [orders, setOrders] = useState([]);
-
+    viewingRequestService.getSellerRequests()
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const res = await API.get('/orders/seller/requests');
+                const res = await viewingRequestService.getSellerRequests();
                 setOrders(res.data);
             } catch (err) { console.error(err); }
         };
@@ -49,6 +49,7 @@ const OrderRequests = () => {
             )}
         </div>
     );
+    
 };
 
 export default OrderRequests;

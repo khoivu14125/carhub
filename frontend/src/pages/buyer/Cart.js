@@ -22,7 +22,16 @@ const Cart = () => {
     setCartItems([]);
   };
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const totalCarPrice = cartItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const depositAmount = Math.round(totalCarPrice * 0.1);
+  const remainingAmount = totalCarPrice - depositAmount;
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(amount);
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -51,41 +60,47 @@ const Cart = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-4">
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-[#111111] border border-gray-800 rounded-2xl p-4 flex gap-4"
-            >
-              <img
-                src={item.images?.split(',')[0]}
-                alt={item.model_name}
-                className="w-36 h-24 object-cover rounded-xl border border-gray-800"
-              />
+          {cartItems.map((item) => {
+            const itemDeposit = Math.round(Number(item.price || 0) * 0.1);
 
-              <div className="flex-1">
-                <h3 className="text-xl font-bold">
-                  {item.brand} {item.model_name}
-                </h3>
-                <p className="text-blue-400 font-semibold mt-2">
-                  {new Intl.NumberFormat('vi-VN', {
-                    style: 'currency',
-                    currency: 'VND',
-                  }).format(item.price)}
-                </p>
-
-                <p className="text-sm text-gray-400 mt-2">
-                  Người bán: {item.seller_name || 'Chưa có'}
-                </p>
-              </div>
-
-              <button
-                onClick={() => handleRemove(item.id)}
-                className="text-gray-400 hover:text-red-500 transition self-start"
+            return (
+              <div
+                key={item.id}
+                className="bg-[#111111] border border-gray-800 rounded-2xl p-4 flex gap-4 hover:border-blue-500/30 transition"
               >
-                <Trash2 size={20} />
-              </button>
-            </div>
-          ))}
+                <img
+                  src={item.images?.split(',')[0]}
+                  alt={item.model_name}
+                  className="w-36 h-24 object-cover rounded-xl border border-gray-800"
+                />
+
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold">
+                    {item.brand} {item.model_name}
+                  </h3>
+
+                  <p className="text-blue-400 font-semibold mt-2">
+                    Giá xe: {formatCurrency(item.price)}
+                  </p>
+
+                  <p className="text-yellow-400 text-sm mt-1 font-medium">
+                    Đặt cọc 10%: {formatCurrency(itemDeposit)}
+                  </p>
+
+                  <p className="text-sm text-gray-400 mt-2">
+                    Người bán: {item.seller_name || 'Chưa có'}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => handleRemove(item.id)}
+                  className="text-gray-400 hover:text-red-500 transition self-start"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            );
+          })}
         </div>
 
         <div className="bg-[#111111] border border-gray-800 rounded-2xl p-6 h-fit space-y-4">
@@ -96,21 +111,33 @@ const Cart = () => {
             <span>{cartItems.length}</span>
           </div>
 
-          <div className="flex justify-between text-lg font-bold border-t border-gray-800 pt-4">
-            <span>Tổng tiền</span>
-            <span className="text-blue-400">
-              {new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND',
-              }).format(totalPrice)}
-            </span>
+          <div className="border-t border-gray-800 pt-4 space-y-3">
+            <div className="flex justify-between text-gray-400">
+              <span>Tổng giá xe</span>
+              <span>{formatCurrency(totalCarPrice)}</span>
+            </div>
+
+            <div className="flex justify-between text-yellow-400 font-bold text-lg">
+              <span>Tiền cọc (10%)</span>
+              <span>{formatCurrency(depositAmount)}</span>
+            </div>
+
+            <div className="flex justify-between text-gray-400">
+              <span>Còn lại</span>
+              <span>{formatCurrency(remainingAmount)}</span>
+            </div>
+          </div>
+
+          <div className="text-sm text-gray-500 leading-relaxed border-t border-gray-800 pt-4">
+            Bạn chỉ cần thanh toán <span className="text-yellow-400 font-semibold">10% tiền cọc</span> để giữ xe.
+            Phần còn lại sẽ thanh toán sau khi hoàn tất giao dịch.
           </div>
 
           <CustomButton
             onClick={() => navigate('/checkout')}
             className="w-full h-14 text-lg"
           >
-            Tiến hành đặt hàng
+            Tiến hành đặt cọc
           </CustomButton>
         </div>
       </div>

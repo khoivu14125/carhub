@@ -30,6 +30,17 @@ const Checkout = () => {
     }));
   };
 
+  const totalCarPrice = cartItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
+  const depositAmount = Math.round(totalCarPrice * 0.1);
+  const remainingAmount = totalCarPrice - depositAmount;
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(amount);
+  };
+
   const handleSubmitOrder = (e) => {
     e.preventDefault();
 
@@ -41,16 +52,17 @@ const Checkout = () => {
     const orderDraft = {
       items: cartItems,
       buyerInfo: formData,
-      totalAmount: cartItems.reduce((sum, item) => sum + Number(item.price || 0), 0),
+      totalCarPrice,
+      depositAmount,
+      remainingAmount,
+      paymentType: 'deposit_10_percent',
     };
 
     localStorage.setItem('checkoutDraft', JSON.stringify(orderDraft));
 
-    alert('Đã lưu thông tin đơn hàng. Bước thanh toán Momo sẽ làm tiếp sau.');
+    alert('Đã lưu thông tin đặt cọc. Bước thanh toán MoMo sẽ dùng số tiền cọc 10%.');
     navigate('/cart');
   };
-
-  const totalPrice = cartItems.reduce((sum, item) => sum + Number(item.price || 0), 0);
 
   return (
     <div className="max-w-6xl mx-auto py-10 grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -67,7 +79,7 @@ const Checkout = () => {
             name="full_name"
             value={formData.full_name}
             onChange={handleChange}
-            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white"
+            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white outline-none focus:border-blue-500"
           />
         </div>
 
@@ -78,7 +90,7 @@ const Checkout = () => {
             name="phone_number"
             value={formData.phone_number}
             onChange={handleChange}
-            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white"
+            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white outline-none focus:border-blue-500"
           />
         </div>
 
@@ -89,7 +101,7 @@ const Checkout = () => {
             value={formData.address}
             onChange={handleChange}
             rows="4"
-            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white"
+            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white outline-none focus:border-blue-500"
           />
         </div>
 
@@ -99,14 +111,19 @@ const Checkout = () => {
             name="paymentMethod"
             value={formData.paymentMethod}
             onChange={handleChange}
-            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white"
+            className="w-full bg-black border border-gray-700 rounded-xl p-3 text-white outline-none focus:border-blue-500"
           >
             <option value="momo">MoMo</option>
           </select>
         </div>
 
+        <div className="bg-blue-600/10 border border-blue-500/20 rounded-xl p-4 text-sm text-gray-300 leading-relaxed">
+          Bạn chỉ cần <span className="text-yellow-400 font-bold">đặt cọc 10%</span> để giữ xe.
+          Phần còn lại sẽ thanh toán sau khi hoàn tất giao dịch.
+        </div>
+
         <CustomButton type="submit" className="w-full h-14 text-lg">
-          Xác nhận đặt hàng
+          Xác nhận đặt cọc
         </CustomButton>
       </form>
 
@@ -118,30 +135,36 @@ const Checkout = () => {
             <img
               src={item.images?.split(',')[0]}
               alt={item.model_name}
-              className="w-28 h-20 object-cover rounded-lg"
+              className="w-28 h-20 object-cover rounded-lg border border-gray-800"
             />
             <div>
               <p className="font-bold">
                 {item.brand} {item.model_name}
               </p>
-              <p className="text-blue-400">
-                {new Intl.NumberFormat('vi-VN', {
-                  style: 'currency',
-                  currency: 'VND',
-                }).format(item.price)}
-              </p>
+              <p className="text-blue-400">{formatCurrency(item.price)}</p>
             </div>
           </div>
         ))}
 
-        <div className="flex justify-between text-lg font-bold pt-4">
-          <span>Tổng thanh toán</span>
-          <span className="text-blue-400">
-            {new Intl.NumberFormat('vi-VN', {
-              style: 'currency',
-              currency: 'VND',
-            }).format(totalPrice)}
-          </span>
+        <div className="space-y-3 pt-4">
+          <div className="flex justify-between text-gray-400">
+            <span>Tổng giá xe</span>
+            <span>{formatCurrency(totalCarPrice)}</span>
+          </div>
+
+          <div className="flex justify-between text-yellow-400 font-bold text-lg">
+            <span>Tiền cọc (10%)</span>
+            <span>{formatCurrency(depositAmount)}</span>
+          </div>
+
+          <div className="flex justify-between text-gray-400">
+            <span>Số tiền còn lại</span>
+            <span>{formatCurrency(remainingAmount)}</span>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 pt-4 text-sm text-gray-500 leading-relaxed">
+          Sau khi thanh toán cọc, xe sẽ được giữ cho bạn. Phần còn lại sẽ thanh toán khi hoàn tất giao dịch trực tiếp.
         </div>
       </div>
     </div>

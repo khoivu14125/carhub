@@ -21,15 +21,42 @@ const Car = {
 
     // Lấy danh sách xe chờ duyệt (Admin xem)
     getPending: async () => {
-        const sql = "SELECT * FROM Cars WHERE status = 'pending'";
+        const sql = `
+            SELECT 
+                Cars.*,
+                Users.name AS seller_name
+            FROM Cars
+            LEFT JOIN Users ON Cars.seller_id = Users.id
+            WHERE Cars.status = 'pending'
+            ORDER BY Cars.id DESC
+        `;
+        const [rows] = await db.query(sql);
+        return rows;
+    },
+
+    // Admin lấy tất cả xe trong hệ thống
+    getAllForAdmin: async () => {
+        const sql = `
+            SELECT 
+                Cars.*,
+                Users.name AS seller_name
+            FROM Cars
+            LEFT JOIN Users ON Cars.seller_id = Users.id
+            ORDER BY Cars.id DESC
+        `;
         const [rows] = await db.query(sql);
         return rows;
     },
 
     // Lấy danh sách xe đã được duyệt (Buyer xem)
-    getAllApproved: async (filters) => {
+    getAllApproved: async (filters = {}) => {
         let sql = "SELECT * FROM Cars WHERE status = 'approved'";
         const params = [];
+
+        if (filters.keyword) {
+            sql += " AND (brand LIKE ? OR model_name LIKE ?)";
+            params.push(`%${filters.keyword}%`, `%${filters.keyword}%`);
+        }
 
         if (filters.brand) {
             sql += " AND brand = ?";
@@ -41,6 +68,8 @@ const Car = {
             params.push(filters.maxPrice);
         }
 
+        sql += " ORDER BY id DESC";
+
         const [rows] = await db.query(sql, params);
         return rows;
     },
@@ -48,9 +77,9 @@ const Car = {
     // Xem chi tiết xe
     getById: async (id) => {
         const sql = `
-            SELECT Cars.*, Users.name as seller_name, Users.phone as seller_phone 
-            FROM Cars 
-            JOIN Users ON Cars.seller_id = Users.id 
+            SELECT Cars.*, Users.name AS seller_name, Users.phone AS seller_phone
+            FROM Cars
+            JOIN Users ON Cars.seller_id = Users.id
             WHERE Cars.id = ?
         `;
         const [rows] = await db.query(sql, [id]);

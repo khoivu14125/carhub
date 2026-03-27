@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import API from '../../services/api';
 import Loader from '../../components/ui/Loader';
 import { Edit3, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 const ManageCars = () => {
     const [myCars, setMyCars] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [searchParams] = useSearchParams();
+    const statusFilter = searchParams.get('status'); // approved | pending | null
 
     useEffect(() => {
         const fetchMyCars = async () => {
@@ -22,11 +25,25 @@ const ManageCars = () => {
         fetchMyCars();
     }, []);
 
+    // 🔥 FILTER THEO STATUS
+    const filteredCars = useMemo(() => {
+        if (!statusFilter) return myCars;
+        return myCars.filter((car) => car.status === statusFilter);
+    }, [myCars, statusFilter]);
+
+    // 🔥 TITLE ĐỘNG
+    const pageTitle =
+        statusFilter === 'approved'
+            ? 'Xe đang bán'
+            : statusFilter === 'pending'
+            ? 'Xe chờ phê duyệt'
+            : 'Quản lý tin đăng';
+
     if (loading) return <Loader />;
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Quản lý tin đăng</h1>
+            <h1 className="text-3xl font-bold text-white">{pageTitle}</h1>
 
             <div className="bg-[#111111] rounded-2xl border border-gray-800 overflow-hidden">
                 <table className="w-full text-left">
@@ -40,7 +57,7 @@ const ManageCars = () => {
                     </thead>
 
                     <tbody className="divide-y divide-gray-800">
-                        {myCars.map((car) => (
+                        {filteredCars.map((car) => (
                             <tr key={car.id} className="hover:bg-blue-500/5 transition-colors">
                                 <td className="p-5 flex items-center gap-4">
                                     <img
@@ -81,18 +98,14 @@ const ManageCars = () => {
                                         <Link
                                             to={`/seller/edit-car/${car.id}`}
                                             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition"
-                                            title="Chỉnh sửa bài đăng"
                                         >
                                             <Edit3 size={16} />
-                                            <span className="hidden sm:inline">Chỉnh sửa</span>
                                         </Link>
 
                                         <button
                                             className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600/10 hover:bg-red-600/20 text-red-400 transition"
-                                            title="Xóa bài đăng"
                                         >
                                             <Trash2 size={16} />
-                                            <span className="hidden sm:inline">Xóa</span>
                                         </button>
                                     </div>
                                 </td>
@@ -101,9 +114,13 @@ const ManageCars = () => {
                     </tbody>
                 </table>
 
-                {myCars.length === 0 && (
+                {filteredCars.length === 0 && (
                     <div className="p-10 text-center text-gray-500">
-                        Bạn chưa có tin đăng nào.
+                        {statusFilter === 'approved'
+                            ? 'Chưa có xe nào đã được duyệt.'
+                            : statusFilter === 'pending'
+                            ? 'Không có xe nào đang chờ duyệt.'
+                            : 'Bạn chưa có tin đăng nào.'}
                     </div>
                 )}
             </div>

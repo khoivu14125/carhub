@@ -67,6 +67,47 @@ updateRole: async (id, role) => {
     const [result] = await db.query(sql, [role, id]);
     return result;
 },
+
+deleteUser: async (id) => {
+    const sql = 'DELETE FROM Users WHERE id = ?';
+    const [result] = await db.query(sql, [id]);
+    return result;
+},
+
+saveResetToken: async (email, token, expire) => {
+    const sql = `
+        UPDATE Users
+        SET reset_password_token = ?, reset_password_expire = ?
+        WHERE email = ?
+    `;
+    const [result] = await db.query(sql, [token, expire, email]);
+    return result;
+},
+
+findByResetToken: async (token) => {
+    const sql = `
+        SELECT *
+        FROM Users
+        WHERE reset_password_token = ?
+          AND reset_password_expire > ?
+        LIMIT 1
+    `;
+    const [rows] = await db.query(sql, [token, Date.now()]);
+    return rows[0];
+},
+
+updatePasswordAndClearToken: async (id, password) => {
+    const sql = `
+        UPDATE Users
+        SET password = ?,
+            reset_password_token = NULL,
+            reset_password_expire = NULL
+        WHERE id = ?
+    `;
+    const [result] = await db.query(sql, [password, id]);
+    return result;
+},
+
 };
 
 module.exports = User;

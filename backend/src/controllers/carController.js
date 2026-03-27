@@ -1,15 +1,23 @@
 const Car = require('../models/Car');
 const Order = require('../models/Order');
+const viewingRequest = require('../models/viewingRequest');
 
 const carController = {
     // Người bán đăng xe
     postCar: async (req, res) => {
         try {
             const imageUrls = req.files.map(file => file.path).join(',');
-            const carData = { ...req.body, images: imageUrls, seller_id: req.user.id };
+            const carData = {
+                ...req.body,
+                images: imageUrls,
+                seller_id: req.user.id
+            };
 
             await Car.create(carData);
-            res.status(201).json({ message: 'Đăng tin thành công, vui lòng chờ Admin duyệt' });
+
+            res.status(201).json({
+                message: 'Đăng tin thành công, vui lòng chờ Admin duyệt'
+            });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -25,13 +33,27 @@ const carController = {
         }
     },
 
+    // Admin lấy tất cả xe
+    getAllCarsForAdmin: async (req, res) => {
+        try {
+            const cars = await Car.getAllForAdmin();
+            res.json(cars);
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    },
+
     // Admin duyệt xe
     approveCar: async (req, res) => {
         try {
             const { id } = req.params;
             const { status } = req.body;
+
             await Car.updateStatus(id, status);
-            res.json({ message: `Đã cập nhật trạng thái xe: ${status}` });
+
+            res.json({
+                message: `Đã cập nhật trạng thái xe: ${status}`
+            });
         } catch (error) {
             res.status(500).json({ message: error.message });
         }
@@ -63,24 +85,42 @@ const carController = {
         }
     },
 
-    // Seller dashboard stats
+    // ==========================
+    // 🔥 SELLER DASHBOARD STATS
+    // ==========================
     getSellerStats: async (req, res) => {
         try {
-            const carStats = await Car.getSellerStats(req.user.id);
-            const orderStats = await Order.getSellerStats(req.user.id);
+            const sellerId = req.user.id;
+
+            // 1. Xe
+            const carStats = await Car.getSellerStats(sellerId);
+
+            // 2. Đơn hàng + doanh thu
+            const orderStats = await Order.getSellerStats(sellerId);
+
+            // 3. Yêu cầu xem xe
+            const viewingRequestsCount =
+                await viewingRequest.countPendingBySellerId(sellerId);
 
             res.json({
                 activeCars: carStats.activeCars || 0,
                 pendingCars: carStats.pendingCars || 0,
-                newOrders: orderStats.newOrders || 0,
-                totalRevenue: orderStats.totalRevenue || 0
+
+                // 👇 NEW
+                viewingRequests: viewingRequestsCount || 0,
+
+                // 👇 đổi tên rõ nghĩa
+                transactionRequests: orderStats.newOrders || 0,
+
+                totalRevenue: orderStats.totalRevenue || 0,
             });
         } catch (error) {
+            console.error('❌ Lỗi getSellerStats:', error);
             res.status(500).json({ message: error.message });
         }
     },
 
-    // Seller lấy danh sách bài đăng của mình
+    // Seller lấy xe của mình
     getMyCars: async (req, res) => {
         try {
             const cars = await Car.getBySellerId(req.user.id);
@@ -90,14 +130,17 @@ const carController = {
         }
     },
 
-    // Seller lấy chi tiết bài đăng của mình để sửa
+    // Seller lấy chi tiết xe
     getSellerCarById: async (req, res) => {
         try {
             const { id } = req.params;
+
             const car = await Car.getByIdAndSeller(id, req.user.id);
 
             if (!car) {
-                return res.status(404).json({ message: 'Không tìm thấy bài đăng' });
+                return res.status(404).json({
+                    message: 'Không tìm thấy bài đăng'
+                });
             }
 
             res.json(car);
@@ -106,14 +149,17 @@ const carController = {
         }
     },
 
-    // Seller cập nhật bài đăng
+    // Seller cập nhật xe
     updateSellerCar: async (req, res) => {
         try {
             const { id } = req.params;
 
             const oldCar = await Car.getByIdAndSeller(id, req.user.id);
+
             if (!oldCar) {
-                return res.status(404).json({ message: 'Không tìm thấy bài đăng để cập nhật' });
+                return res.status(404).json({
+                    message: 'Không tìm thấy bài đăng để cập nhật'
+                });
             }
 
             let keptImages = [];
